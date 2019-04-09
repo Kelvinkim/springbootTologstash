@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <property name="spring.application.name" value="demo"/>
+    <!-- 파일 로깅 위치 설정 -->
+    <property name="LOG_FILE_PATH" value="./logs"/>
+    <!-- 파일 로깅 이름 -->
+    <property name="LOG_FILE" value="demo-ap.log"/>
+    <property name="LOG_FILE_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %class{0}:[:%line] - %m%n"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
+    <appender name="stash" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <destination>localhost:4560</destination>
+        <!-- encoder is required -->
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- Support multiple-JVM writing to the same log file -->
+        <prudent>true</prudent>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_FILE_PATH}/${LOG_FILE}.%d{yyyy-MM-dd}</fileNamePattern>
+            <maxHistory>60</maxHistory>
+            <totalSizeCap>10GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${LOG_FILE_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="FILE" />
+        <appender-ref ref="stash" />
+    </root>
+</configuration>
